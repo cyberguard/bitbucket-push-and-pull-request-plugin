@@ -1,0 +1,32 @@
+<div>
+    <p>
+        Allow you to override the URL in the bitbucket payload from the webhook so that it match the
+        url you define in the SCM configuration.
+    </p>
+
+    <p>
+        If you are seeing the message
+        <ul>
+            <i>skipping resolution of commit eef18d94302f5a3945796e77ee8ec46a69fd1ddf, since it originates from another repository</i>
+        </ul>
+        then most likely the JSON posted by Bitbucket to your Jenkins Webhook has a URL of the type
+        <ul>https://bitbucket.org/XXXX/YYYY</ul>
+        but your SCM Repository URL config has another url
+    </p>
+
+    <p>
+        This allows you to update the URL inside the JSON received from BitBucket to match that of your SCM config.
+    </p>
+
+    <p>
+        For example:
+        <pre>
+        {
+        "https://bitbucket.org/XXXX/YYYY" : "https://ZZZZ@bitbucket.org/XXXX/YYYY.git"
+        }
+        </pre>
+        would change the URL from <i>https://bitbucket.org/XXXX/YYYY</i> to <i>https://ZZZZ@bitbucket.org/XXXX/YYYY.git</i>
+        before
+        trying to match it to your SCM config.
+    </p>
+</div>

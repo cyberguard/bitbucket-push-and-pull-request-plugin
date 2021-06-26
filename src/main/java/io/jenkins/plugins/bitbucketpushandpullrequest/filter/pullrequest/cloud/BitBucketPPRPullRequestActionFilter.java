@@ -24,6 +24,10 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.pullrequest.cloud;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import hudson.EnvVars;
 import hudson.model.AbstractDescribableImpl;
@@ -31,10 +35,14 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.action.BitBucketPPRAction;
 import io.jenkins.plugins.bitbucketpushandpullrequest.cause.BitBucketPPRTriggerCause;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import io.jenkins.plugins.bitbucketpushandpullrequest.util.BitBucketPPRUtils;
+import net.sf.json.JSONObject;
+import org.kohsuke.stapler.DataBoundSetter;
 
 
 public abstract class BitBucketPPRPullRequestActionFilter
     extends AbstractDescribableImpl<BitBucketPPRPullRequestActionFilter> {
+
+  private static final Logger logger = Logger.getLogger(BitBucketPPRPullRequestActionFilter.class.getName());
 
   public boolean matches(String allowedBranches, String branchName, EnvVars env) {
     return BitBucketPPRUtils.matches(allowedBranches, branchName, env);
@@ -46,4 +54,35 @@ public abstract class BitBucketPPRPullRequestActionFilter
       BitBucketPPRAction pullRequestAction, BitBucketPPRHookEvent bitBucketEvent) throws IOException;
 
   public abstract boolean shouldSendApprove();
+
+  public Map<String, String> prRepoOverrides = new HashMap<String,String>();
+
+  @DataBoundSetter
+  public void setPrRepoOverrides(String prRepoOverrides){
+    if ( prRepoOverrides != null ){
+      JSONObject cfg = JSONObject.fromObject( prRepoOverrides);
+      for (Iterator<String> itt = cfg.keys(); itt.hasNext(); ){
+        String orig = itt.next();
+        String override = cfg.getString( orig );
+        this.prRepoOverrides.put( orig, override);
+      }
+    }
+  }
+
+  public String getPrRepoOverrides(){
+    JSONObject cfg = JSONObject.fromObject( prRepoOverrides);
+    return cfg.toString( );
+  }
+
+  public String getRepositoryOverrideForUrl(String orig_repo_url ){
+    for (Map.Entry<String, String> entry : prRepoOverrides.entrySet()) {
+      String bitBucketRepositoryUrl = entry.getKey();
+      String gitScmRepositoryUrl = entry.getValue();
+      if (orig_repo_url.equals( bitBucketRepositoryUrl ) ){
+        logger.finest("Git URL override for " + bitBucketRepositoryUrl + " is " + gitScmRepositoryUrl);
+        return gitScmRepositoryUrl ;
+      }
+    }
+    return orig_repo_url;
+  }
 }

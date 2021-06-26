@@ -83,4 +83,7 @@ public class BitBucketPPRPullRequestServerTriggerFilter extends BitBucketPPRTrig
   public boolean shouldSendApprove() {
     return actionFilter.shouldSendApprove();
   }
+
+  @Override
+  public void preProcessHook(BitBucketPPRAction action) { /* no op not implemented for server */ }
 }

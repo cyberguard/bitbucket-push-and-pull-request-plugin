@@ -132,6 +132,7 @@ public class BitBucketPPRTrigger extends Trigger<Job<?, ?>> {
               for (BitBucketPPRTriggerFilter filter : matchingFilters) {
                 BitBucketPPRTriggerCause cause;
                 try {
+                  filter.preProcessHook( bitbucketAction );
                   cause = filter.getCause(getLogFile(), bitbucketAction, bitbucketEvent);
 
                   logger.info("The polling of the BB PPR job was successful for the cause: " + cause.toString());

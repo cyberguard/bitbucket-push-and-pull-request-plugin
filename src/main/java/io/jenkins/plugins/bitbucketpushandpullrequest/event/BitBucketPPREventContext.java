@@ -64,6 +64,7 @@ public class BitBucketPPREventContext {
     this.userRemoteConfig = getUserRemoteConfigs(scmTrigger);
     this.credentialsId = userRemoteConfig.getCredentialsId();
     this.url = userRemoteConfig.getUrl();
+    filter.preProcessHook( action );
   }
 
   public StandardCredentials getStandardCredentials() throws Exception {

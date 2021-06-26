@@ -25,6 +25,7 @@ package io.jenkins.plugins.bitbucketpushandpullrequest.filter.repository;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -35,6 +36,7 @@ import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTrigger
 import io.jenkins.plugins.bitbucketpushandpullrequest.filter.BitBucketPPRTriggerFilterDescriptor;
 import io.jenkins.plugins.bitbucketpushandpullrequest.model.BitBucketPPRHookEvent;
 import jenkins.model.Jenkins;
+import java.util.logging.Logger;
 
 
 public class BitBucketPPRRepositoryTriggerFilter extends BitBucketPPRTriggerFilter {
@@ -81,5 +83,13 @@ public class BitBucketPPRRepositoryTriggerFilter extends BitBucketPPRTriggerFilt
   @Override
   public boolean shouldTriggerAlsoIfNothingChanged() {
     return actionFilter.shouldTriggerAlsoIfNothingChanged();
+  }
+
+  @Override
+  public void preProcessHook(BitBucketPPRAction action) {
+    for (ListIterator<String> itt = action.getScmUrls().listIterator(); itt.hasNext(); ){
+      String scmUrlStr = itt.next();
+      itt.set( actionFilter.getRepositoryOverrideForUrl( scmUrlStr) );
+    }
   }
 }
